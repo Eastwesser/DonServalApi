@@ -3,11 +3,11 @@ import shutil
 
 from fastapi import FastAPI, Depends, File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
-from schemas_dir.schemas import Donut, DonutCreate
 from sqlalchemy.orm import Session
 
-from database_dir.database import engine, get_db
-from models_dir.models import Base, Donut as DonutModel
+from api.database_dir.database import engine, get_db
+from api.models_dir.models import Base, Donut as DonutModel
+from api.schemas_dir.schemas import Donut, DonutCreate
 
 app = FastAPI()
 

@@ -8,6 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+alembic.ini
 build/
 develop-eggs/
 dist/

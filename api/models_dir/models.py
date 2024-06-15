@@ -9,5 +9,5 @@ class Donut(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    description = Column(String)
-    image_path = Column(String)
+    description = Column(String, index=True)
+    image_path = Column(String, nullable=True)
