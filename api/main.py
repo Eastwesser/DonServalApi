@@ -82,9 +82,19 @@ def get_image(donut_id: int, db: Session = Depends(get_db)):
 
 
 # PUT /donuts/{donut_id} - Update Donut
-@app.put("/donuts/{donut_id}", response_model=Donut, tags=["Donuts"])
+@app.put("/donuts/{donut_id}", response_model=Donut)
 def update_donut_endpoint(donut_id: int, donut: DonutUpdate, db: Session = Depends(get_db)):
-    return update_donut(db, donut_id, donut)
+    db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
+    if db_donut is None:
+        raise HTTPException(status_code=404, detail="Donut not found")
+
+    update_data = donut.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_donut, key, value)
+
+    db.commit()
+    db.refresh(db_donut)
+    return db_donut
 
 
 # DELETE /donuts/{donut_id} - Delete Donut

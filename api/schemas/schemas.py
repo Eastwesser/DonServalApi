@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class DonutCreate(BaseModel):
@@ -16,12 +16,11 @@ class Donut(BaseModel):
     price: int
     image_filename: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DonutUpdate(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
-    price: Optional[int]
-    image_filename: Optional[str]
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[int] = None
+    image_filename: Optional[str] = None
