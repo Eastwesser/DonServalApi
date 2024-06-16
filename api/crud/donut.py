@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from api.models_dir.models import Donut as DonutModel
-from api.schemas_dir.schemas import DonutCreate, DonutUpdate
+from api.models.models import Donut as DonutModel
+from api.schemas.schemas import DonutCreate, DonutUpdate
 
 
 def create_donut(db: Session, donut: DonutCreate):

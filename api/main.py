@@ -7,9 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from api.crud.donut import delete_donut, update_donut
-from api.database_dir.database import engine, get_db
-from api.models_dir.models import Base, Donut as DonutModel
-from api.schemas_dir.schemas import Donut, DonutCreate, DonutUpdate
+from api.database.database import engine, get_db
+from api.models.models import Base, Donut as DonutModel
+from api.schemas.schemas import Donut, DonutCreate, DonutUpdate
 
 app = FastAPI()
 
@@ -18,7 +18,7 @@ IMAGE_DIR = "api/images"
 # Check folder existence
 os.makedirs(IMAGE_DIR, exist_ok=True)
 
-# DB creation, if needed
+# Create the database tables if they don't exist
 Base.metadata.create_all(bind=engine)
 
 

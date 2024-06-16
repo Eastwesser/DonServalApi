@@ -7,19 +7,19 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-# Добавляем корневой каталог проекта в sys.path
+# Add the root project directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from api.models_dir.models import Base  # Импортируем вашу модель
-from api.config import Config  # Получение конфигурации URL базы данных
+from api.models.models import Base  # Import your model
+from api.config import Config  # Get DB URL configuration
 
-# Получение конфигурации из alembic.ini
+# Load configuration from alembic.ini
 config = context.config
 
-# Интерпретация конфигурационного файла для Python логирования.
+# Interpret the config file for Python logging.
 fileConfig(config.config_file_name)
 
-# Установка метаданных для поддержки 'autogenerate'.
+# Set metadata for 'autogenerate' support
 target_metadata = Base.metadata
 
 
@@ -33,8 +33,11 @@ def run_migrations_offline():
 
 def run_migrations_online():
     """Run migrations in 'online' mode."""
-    connectable = engine_from_config(config.get_section(config.config_ini_section), prefix="sqlalchemy.",
-                                     poolclass=pool.NullPool)
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
