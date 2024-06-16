@@ -81,7 +81,7 @@ def get_image(donut_id: int, db: Session = Depends(get_db)):
 
 
 # PUT /donuts/{donut_id} - Update Donut
-@app.put("/donuts/{donut_id}", response_model=Donut)
+@app.put("/donuts/{donut_id}", response_model=Donut, tags=["Donuts"])
 def update_donut_endpoint(donut_id: int, donut: DonutUpdate, db: Session = Depends(get_db)):
     db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
     if db_donut is None:
