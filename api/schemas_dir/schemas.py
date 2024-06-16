@@ -18,3 +18,10 @@ class Donut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class DonutUpdate(BaseModel):
+    name: Optional[str]
+    description: Optional[str]
+    price: Optional[int]
+    image_filename: Optional[str]
