@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from api.crud.donut import delete_donut, update_donut
+from api.crud.donut import create_donut, delete_donut, get_donut, update_donut
 from api.database.database import engine, get_db
 from api.models.models import Base, Donut as DonutModel
 from api.schemas.schemas import Donut, DonutCreate, DonutUpdate
@@ -14,9 +14,7 @@ from api.schemas.schemas import Donut, DonutCreate, DonutUpdate
 app = FastAPI()
 
 IMAGE_DIR = "api/images"
-
-# Check folder existence
-os.makedirs(IMAGE_DIR, exist_ok=True)
+os.makedirs(IMAGE_DIR, exist_ok=True)  # Ensure the directory exists
 
 # Create the database tables if they don't exist
 Base.metadata.create_all(bind=engine)
@@ -24,13 +22,9 @@ Base.metadata.create_all(bind=engine)
 
 # POST /donuts/ - Create Donut
 @app.post("/donuts/", response_model=Donut)
-def create_donut(donut: DonutCreate, db: Session = Depends(get_db)):
+def create_donut_endpoint(donut: DonutCreate, db: Session = Depends(get_db)):
     try:
-        db_donut = DonutModel(name=donut.name, description=donut.description, price=donut.price)
-        db.add(db_donut)
-        db.commit()
-        db.refresh(db_donut)
-        return db_donut
+        return create_donut(db, donut)
     except SQLAlchemyError as e:
         print(f"Error creating donut: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -55,12 +49,8 @@ def upload_image(donut_id: int, file: UploadFile = File(...), db: Session = Depe
 
 # GET /donuts/{donut_id} - Get Donut by ID
 @app.get("/donuts/{donut_id}", response_model=Donut)
-def get_donut(donut_id: int, db: Session = Depends(get_db)):
-    db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
-    if db_donut is None:
-        raise HTTPException(status_code=404, detail="Donut not found")
-
-    return db_donut
+def read_donut(donut_id: int, db: Session = Depends(get_db)):
+    return get_donut(db, donut_id)
 
 
 # GET /donuts/{donut_id}/image - Get Donut Image by ID
@@ -69,7 +59,6 @@ def get_image(donut_id: int, db: Session = Depends(get_db)):
     db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
     if db_donut is None or db_donut.image_filename is None:
         raise HTTPException(status_code=404, detail="Image not found")
-
     return FileResponse(db_donut.image_filename)
 
 
@@ -88,8 +77,4 @@ def delete_donut_endpoint(donut_id: int, db: Session = Depends(get_db)):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-    )
+    uvicorn.run(app, host="0.0.0.0", port=8000)
