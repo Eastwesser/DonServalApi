@@ -16,7 +16,6 @@ from api.crud.donut import (
     create_donut,
     delete_donut,
     get_donut,
-    update_donut,
 )
 from api.database.database import engine, get_db
 from api.models.models import Base, Donut as DonutModel
@@ -88,7 +87,7 @@ def update_donut_endpoint(donut_id: int, donut: DonutUpdate, db: Session = Depen
     if db_donut is None:
         raise HTTPException(status_code=404, detail="Donut not found")
 
-    update_data = donut.dict(exclude_unset=True)
+    update_data = donut.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(db_donut, key, value)
 

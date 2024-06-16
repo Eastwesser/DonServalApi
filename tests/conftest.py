@@ -4,18 +4,27 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from api.main import app
+from api.models.models import Base as MainBase
 from tests.config_test import TestConfig
 from tests.models_test import TestBase
 
-test_engine = create_engine(TestConfig.TEST_DB_URL)
-TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+# Setup the database connection for testing
+engine = create_engine(TestConfig.TEST_DB_URL)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 @pytest.fixture(scope='module')
 def test_db():
-    TestBase.metadata.create_all(bind=test_engine)
-    yield TestSessionLocal()
-    TestBase.metadata.drop_all(bind=test_engine)
+    # Create test tables
+    TestBase.metadata.create_all(bind=engine)
+    MainBase.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        TestBase.metadata.drop_all(bind=engine)
+        MainBase.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope='module')
