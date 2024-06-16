@@ -1,17 +1,36 @@
 import os
 import shutil
 
-from fastapi import FastAPI, Depends, File, UploadFile, HTTPException
+from fastapi import (
+    FastAPI,
+    Depends,
+    File,
+    UploadFile,
+    HTTPException,
+)
 from fastapi.responses import FileResponse
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from api.crud.donut import create_donut, delete_donut, get_donut, update_donut
+from api.crud.donut import (
+    create_donut,
+    delete_donut,
+    get_donut,
+    update_donut,
+)
 from api.database.database import engine, get_db
 from api.models.models import Base, Donut as DonutModel
-from api.schemas.schemas import Donut, DonutCreate, DonutUpdate
+from api.schemas.schemas import (
+    Donut,
+    DonutCreate,
+    DonutUpdate,
+)
 
-app = FastAPI()
+app = FastAPI(
+    title="DonServal API",
+    description="Serval Donut API for the donut shop",
+    version="1.0.0",
+)
 
 IMAGE_DIR = "api/images"
 os.makedirs(IMAGE_DIR, exist_ok=True)  # Ensure the directory exists
@@ -21,7 +40,7 @@ Base.metadata.create_all(bind=engine)
 
 
 # POST /donuts/ - Create Donut
-@app.post("/donuts/", response_model=Donut)
+@app.post("/donuts/", response_model=Donut, tags=["Donuts"])
 def create_donut_endpoint(donut: DonutCreate, db: Session = Depends(get_db)):
     try:
         return create_donut(db, donut)
@@ -31,7 +50,7 @@ def create_donut_endpoint(donut: DonutCreate, db: Session = Depends(get_db)):
 
 
 # POST /donuts/{donut_id}/upload-image/ - Upload Image
-@app.post("/donuts/{donut_id}/upload-image/")
+@app.post("/donuts/{donut_id}/upload-image/", tags=["Donuts"])
 def upload_image(donut_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
     db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
     if db_donut is None:
@@ -48,13 +67,13 @@ def upload_image(donut_id: int, file: UploadFile = File(...), db: Session = Depe
 
 
 # GET /donuts/{donut_id} - Get Donut by ID
-@app.get("/donuts/{donut_id}", response_model=Donut)
+@app.get("/donuts/{donut_id}", response_model=Donut, tags=["Donuts"])
 def read_donut(donut_id: int, db: Session = Depends(get_db)):
     return get_donut(db, donut_id)
 
 
 # GET /donuts/{donut_id}/image - Get Donut Image by ID
-@app.get("/donuts/{donut_id}/image")
+@app.get("/donuts/{donut_id}/image", tags=["Donuts"])
 def get_image(donut_id: int, db: Session = Depends(get_db)):
     db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
     if db_donut is None or db_donut.image_filename is None:
@@ -63,13 +82,13 @@ def get_image(donut_id: int, db: Session = Depends(get_db)):
 
 
 # PUT /donuts/{donut_id} - Update Donut
-@app.put("/donuts/{donut_id}", response_model=Donut)
+@app.put("/donuts/{donut_id}", response_model=Donut, tags=["Donuts"])
 def update_donut_endpoint(donut_id: int, donut: DonutUpdate, db: Session = Depends(get_db)):
     return update_donut(db, donut_id, donut)
 
 
 # DELETE /donuts/{donut_id} - Delete Donut
-@app.delete("/donuts/{donut_id}")
+@app.delete("/donuts/{donut_id}", tags=["Donuts"])
 def delete_donut_endpoint(donut_id: int, db: Session = Depends(get_db)):
     return delete_donut(db, donut_id)
 
@@ -77,4 +96,8 @@ def delete_donut_endpoint(donut_id: int, db: Session = Depends(get_db)):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000,
+    )
