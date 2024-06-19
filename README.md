@@ -45,6 +45,7 @@ Request Body:
   "name": "Chocolate",
   "description": "Classic donut covered in exquisite Belgian chocolate."
 }`
+
 Response:
 `{
   "id": 1,
