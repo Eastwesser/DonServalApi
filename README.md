@@ -32,7 +32,7 @@ source .venv/bin/activate # On Windows use `.venv\Scripts\activate`
 
 To run the FastAPI application, use the following command:
 
-`uvicorn main:app --reload`
+`uvicorn api.main:app --reload`
 
 The application will be available at http://127.0.0.1:8000.
 
