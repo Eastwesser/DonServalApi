@@ -10,6 +10,7 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from api.crud.donut import (
@@ -32,7 +33,7 @@ app = FastAPI(
 )
 
 IMAGE_DIR = "api/images"
-os.makedirs(IMAGE_DIR, exist_ok=True)  # Ensure the directory exists
+os.makedirs(IMAGE_DIR, exist_ok=True)
 
 # Create the database tables if they don't exist
 Base.metadata.create_all(bind=engine)
@@ -40,9 +41,9 @@ Base.metadata.create_all(bind=engine)
 
 # POST /donuts/ - Create Donut
 @app.post("/donuts/", response_model=Donut, tags=["Donuts"])
-def create_donut_endpoint(donut: DonutCreate, db: Session = Depends(get_db)):
+async def create_donut_endpoint(donut: DonutCreate, db: AsyncSession = Depends(get_db)):
     try:
-        return create_donut(db, donut)
+        return await create_donut(db, donut)
     except SQLAlchemyError as e:
         print(f"Error creating donut: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -50,8 +51,8 @@ def create_donut_endpoint(donut: DonutCreate, db: Session = Depends(get_db)):
 
 # POST /donuts/{donut_id}/upload-image/ - Upload Image
 @app.post("/donuts/{donut_id}/upload-image/", tags=["Donuts"])
-def upload_image(donut_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
+async def upload_image(donut_id: int, file: UploadFile = File(...), db: AsyncSession = Depends(get_db)):
+    db_donut = await get_donut(db, donut_id)
     if db_donut is None:
         raise HTTPException(status_code=404, detail="Donut not found")
 
@@ -60,21 +61,21 @@ def upload_image(donut_id: int, file: UploadFile = File(...), db: Session = Depe
         shutil.copyfileobj(file.file, buffer)
 
     db_donut.image_filename = file_location
-    db.commit()
-    db.refresh(db_donut)
+    await db.commit()
+    await db.refresh(db_donut)
     return {"info": "Image uploaded successfully"}
 
 
 # GET /donuts/{donut_id} - Get Donut by ID
 @app.get("/donuts/{donut_id}", response_model=Donut, tags=["Donuts"])
-def read_donut(donut_id: int, db: Session = Depends(get_db)):
-    return get_donut(db, donut_id)
+async def read_donut(donut_id: int, db: AsyncSession = Depends(get_db)):
+    return await get_donut(db, donut_id)
 
 
 # GET /donuts/{donut_id}/image - Get Donut Image by ID
 @app.get("/donuts/{donut_id}/image", tags=["Donuts"])
-def get_image(donut_id: int, db: Session = Depends(get_db)):
-    db_donut = db.query(DonutModel).filter(DonutModel.id == donut_id).first()
+async def get_image(donut_id: int, db: AsyncSession = Depends(get_db)):
+    db_donut = await get_donut(db, donut_id)
     if db_donut is None or db_donut.image_filename is None:
         raise HTTPException(status_code=404, detail="Image not found")
     return FileResponse(db_donut.image_filename)
@@ -98,8 +99,8 @@ def update_donut_endpoint(donut_id: int, donut: DonutUpdate, db: Session = Depen
 
 # DELETE /donuts/{donut_id} - Delete Donut
 @app.delete("/donuts/{donut_id}", tags=["Donuts"])
-def delete_donut_endpoint(donut_id: int, db: Session = Depends(get_db)):
-    return delete_donut(db, donut_id)
+async def delete_donut_endpoint(donut_id: int, db: AsyncSession = Depends(get_db)):
+    return await delete_donut(db, donut_id)
 
 
 if __name__ == "__main__":
