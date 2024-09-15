@@ -33,7 +33,8 @@ async def update_donut_endpoint(donut_id: int, donut: DonutUpdate,
 
 @router.delete("/{donut_id}")
 async def delete_donut_endpoint(donut_id: int, db: AsyncSession = Depends(db_helper.session_dependency)):
-    return await delete_donut(db, donut_id)
+    await delete_donut(db, donut_id)
+    return {"message": "Donut deleted successfully"}
 
 
 @router.post("/{donut_id}/upload-image/")
