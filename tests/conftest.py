@@ -3,8 +3,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from api.main import app
-from api.models.models import Base as MainBase
+from donuts import app
+from core.models import Base as MainBase
 from tests.config_test import TestConfig
 from tests.models_test import TestBase
 

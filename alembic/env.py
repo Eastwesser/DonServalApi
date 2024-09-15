@@ -10,8 +10,8 @@ from sqlalchemy import engine_from_config, pool
 # Add the root project directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from api.models.models import Base  # Import your model
-from api.config import Config  # Get DB URL configuration
+from core.models import Base  # Import your model
+from core.config import Config  # Get DB URL configuration
 
 # Load configuration from alembic.ini
 config = context.config
