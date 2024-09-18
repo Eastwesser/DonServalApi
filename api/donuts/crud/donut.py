@@ -18,7 +18,11 @@ async def get_donut(db: AsyncSession, donut_id: int):
     return result.scalars().first()
 
 
-async def update_donut(db: AsyncSession, donut_id: int, donut_data: DonutUpdate):
+async def update_donut(
+        db: AsyncSession,
+        donut_id: int,
+        donut_data: DonutUpdate,
+):
     db_donut = await get_donut(db, donut_id)
     if not db_donut:
         return None
