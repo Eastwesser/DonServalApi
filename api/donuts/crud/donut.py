@@ -1,3 +1,7 @@
+from typing import Optional
+
+from sqlalchemy import Sequence
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -5,36 +9,67 @@ from api.core.models.donut import Donut
 from api.donuts.schemas.schemas import DonutCreate, DonutUpdate
 
 
-async def create_donut(db: AsyncSession, donut: DonutCreate):
-    new_donut = Donut(**donut.dict())
-    db.add(new_donut)
-    await db.commit()
-    await db.refresh(new_donut)
+async def create_donut(
+        session: AsyncSession,
+        donut_create: DonutCreate,
+) -> Donut:
+    new_donut = Donut(**donut_create.model_dump())
+    session.add(new_donut)
+    await session.commit()
+    await session.refresh(new_donut)
     return new_donut
 
 
-async def get_donut(db: AsyncSession, donut_id: int):
-    result = await db.execute(select(Donut).filter(Donut.id == donut_id))
-    return result.scalars().first()
+async def get_all_donuts(
+        session: AsyncSession,
+) -> Sequence[Donut]:
+    stmt = select(Donut).order_by(Donut.id)
+    result = await session.scalars(stmt)
+    return result.all()
+
+
+async def get_donut_by_id(
+        session: AsyncSession,
+        donut_id: int
+) -> Optional[Donut]:
+    stmt = select(Donut).filter(Donut.id == donut_id)
+    result = await session.scalars(stmt)
+    return result.first()
 
 
 async def update_donut(
-        db: AsyncSession,
+        session: AsyncSession,
         donut_id: int,
-        donut_data: DonutUpdate,
-):
-    db_donut = await get_donut(db, donut_id)
-    if not db_donut:
+        donut_update: DonutUpdate
+) -> Optional[Donut]:
+    stmt = select(Donut).where(Donut.id == donut_id)
+    result = await session.execute(stmt)
+
+    try:
+        donut = result.scalar_one()
+    except NoResultFound:
         return None
-    for key, value in donut_data.dict(exclude_unset=True).items():
-        setattr(db_donut, key, value)
-    await db.commit()
-    await db.refresh(db_donut)
-    return db_donut
+
+    for key, value in donut_update.model_dump(exclude_unset=True).items():
+        setattr(donut, key, value)
+
+    await session.commit()
+    await session.refresh(donut)
+    return donut
 
 
-async def delete_donut(db: AsyncSession, donut_id: int):
-    db_donut = await get_donut(db, donut_id)
-    if db_donut:
-        await db.delete(db_donut)
-        await db.commit()
+async def delete_donut(
+        session: AsyncSession,
+        donut_id: int
+) -> bool:
+    stmt = select(Donut).where(Donut.id == donut_id)
+    result = await session.execute(stmt)
+
+    try:
+        donut = result.scalar_one()
+    except NoResultFound:
+        return False
+
+    await session.delete(donut)
+    await session.commit()
+    return True
