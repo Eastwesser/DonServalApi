@@ -22,7 +22,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.include_router(donuts_router, prefix="/donuts")
+app.include_router(
+    donuts_router,
+    prefix="/donuts",
+)
 
 if __name__ == "__main__":
     uvicorn.run(
