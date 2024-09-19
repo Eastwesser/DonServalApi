@@ -1,7 +1,6 @@
 from typing import Optional
 
 from sqlalchemy import Sequence
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -28,26 +27,14 @@ async def get_all_donuts(
     return result.all()
 
 
-async def get_donut_by_id(
-        session: AsyncSession,
-        donut_id: int
-) -> Optional[Donut]:
-    stmt = select(Donut).filter(Donut.id == donut_id)
-    result = await session.scalars(stmt)
-    return result.first()
-
-
 async def update_donut(
         session: AsyncSession,
         donut_id: int,
         donut_update: DonutUpdate
 ) -> Optional[Donut]:
-    stmt = select(Donut).where(Donut.id == donut_id)
-    result = await session.execute(stmt)
+    donut: Optional[Donut] = await session.get(Donut, donut_id)
 
-    try:
-        donut = result.scalar_one()
-    except NoResultFound:
+    if not donut:
         return None
 
     for key, value in donut_update.model_dump(exclude_unset=True).items():
@@ -62,12 +49,9 @@ async def delete_donut(
         session: AsyncSession,
         donut_id: int
 ) -> bool:
-    stmt = select(Donut).where(Donut.id == donut_id)
-    result = await session.execute(stmt)
+    donut: Optional[Donut] = await session.get(Donut, donut_id)
 
-    try:
-        donut = result.scalar_one()
-    except NoResultFound:
+    if not donut:
         return False
 
     await session.delete(donut)
