@@ -1,6 +1,5 @@
-from typing import Optional
+from typing import Optional, Sequence
 
-from sqlalchemy import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -16,21 +15,27 @@ async def create_donut(
     session.add(new_donut)
     await session.commit()
     await session.refresh(new_donut)
+    # await session.flush()  # instantly fixes all new data info in database
     return new_donut
 
 
-async def get_all_donuts(
+async def get_donut_by_id(
         session: AsyncSession,
-) -> Sequence[Donut]:
-    stmt = select(Donut).order_by(Donut.id)
-    result = await session.scalars(stmt)
-    return result.all()
+        donut_id: int,
+) -> Optional[Donut]:
+    return await session.get(Donut, donut_id)
+
+
+async def get_all_donuts(session: AsyncSession) -> Sequence[Donut]:
+    stmt = select(Donut)
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 
 async def update_donut(
         session: AsyncSession,
         donut_id: int,
-        donut_update: DonutUpdate
+        donut_update: DonutUpdate,
 ) -> Optional[Donut]:
     donut: Optional[Donut] = await session.get(Donut, donut_id)
 
@@ -47,7 +52,7 @@ async def update_donut(
 
 async def delete_donut(
         session: AsyncSession,
-        donut_id: int
+        donut_id: int,
 ) -> bool:
     donut: Optional[Donut] = await session.get(Donut, donut_id)
 
