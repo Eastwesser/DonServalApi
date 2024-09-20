@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from tests.config_test import TestConfig
-from tests.models_test import TestBase
+from tests.models_test import Donut
 
 engine = create_engine(TestConfig.TEST_DB_URL)
 TestingSessionLocal = sessionmaker(
@@ -18,14 +18,14 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture(scope='module')
 def test_db():
-    TestBase.metadata.create_all(bind=engine)
+    Donut.metadata.create_all(bind=engine)
     MainBase.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
         yield db
     finally:
         db.close()
-        TestBase.metadata.drop_all(bind=engine)
+        Donut.metadata.drop_all(bind=engine)
         MainBase.metadata.drop_all(bind=engine)
 
 

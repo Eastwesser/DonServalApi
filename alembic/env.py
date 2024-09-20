@@ -11,7 +11,7 @@ from sqlalchemy import engine_from_config, pool
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from core.models import Base  # Import your model
-from core.config import Config  # Get DB URL configuration
+from core.config import Settings  # Get DB URL configuration
 
 # Load configuration from alembic.ini
 config = context.config
@@ -25,7 +25,7 @@ target_metadata = Base.metadata
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
-    url = Config.DB_URL
+    url = Settings.DB_URL
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
     with context.begin_transaction():
         context.run_migrations()

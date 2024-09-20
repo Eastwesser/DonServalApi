@@ -1,10 +1,14 @@
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+from sqlalchemy.orm import (
+    declarative_base,
+    Mapped,
+    mapped_column,
+)
 
-TestBase = declarative_base()
+BaseTestModel = declarative_base()
 
 
-class TestDonut(TestBase):
+class Donut(BaseTestModel):
     __tablename__ = "donuts_test"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String)
