@@ -16,10 +16,10 @@ router = APIRouter(tags=["Donuts"])
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 IMAGE_DIR = BASE_DIR / "images"
 # Create the 'images' directory if it doesn't exist.
-IMAGE_DIR.mkdir(
-    parents=True,
-    exist_ok=True,
-)
+# IMAGE_DIR.mkdir(
+#     parents=True,
+#     exist_ok=True,
+# )
 
 
 # POST endpoint to create a new donut record in the database.
