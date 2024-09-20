@@ -1,13 +1,13 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 
 TestBase = declarative_base()
 
 
 class TestDonut(TestBase):
     __tablename__ = "donuts_test"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    description = Column(String, index=True)
-    price = Column(Integer)
-    image_filename = Column(String, nullable=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(String)
+    price: Mapped[int] = mapped_column(Integer)
+    image_filename: Mapped[str] = mapped_column(String, nullable=True)
