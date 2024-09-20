@@ -12,6 +12,7 @@ class DatabaseHelper:
             autocommit=False,
         )
 
+    # Function to provide async DB sessions as a dependency in FastAPI routes.
     async def session_dependency(self):
         async with self.session_factory() as session:
             yield session
