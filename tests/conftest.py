@@ -9,7 +9,11 @@ from tests.config_test import TestConfig
 from tests.models_test import TestBase
 
 engine = create_engine(TestConfig.TEST_DB_URL)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
 
 
 @pytest.fixture(scope='module')
