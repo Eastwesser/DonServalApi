@@ -1,6 +1,8 @@
 alembic==1.13.1
 annotated-types==0.7.0
 anyio==4.4.0
+async-timeout==4.0.3
+asyncpg==0.29.0
 certifi==2024.6.2
 charset-normalizer==3.3.2
 click==8.1.7
@@ -30,10 +32,12 @@ packaging==24.1
 pluggy==1.5.0
 psycopg2-binary==2.9.9
 pydantic==2.7.4
+pydantic-settings==2.5.2
 pydantic_core==2.18.4
 Pygments==2.18.0
 PySocks==1.7.1
 pytest==8.2.2
+pytest-asyncio==0.24.0
 python-dotenv==1.0.1
 python-multipart==0.0.9
 PyYAML==6.0.1
