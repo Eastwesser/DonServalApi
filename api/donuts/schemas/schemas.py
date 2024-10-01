@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-# Schema for creating a new donut.
+# Schema for creating a new donut - for Pydantic validation
 class DonutCreate(BaseModel):
     name: str
     description: str
